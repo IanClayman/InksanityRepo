@@ -32,8 +32,10 @@ public class ScoreScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        score += scorePerSec * Time.deltaTime;
+        if (LivesScript.lives > 0 && !(CountdownScript.timer > 0)) {
+            score += scorePerSec * Time.deltaTime;
         
-        scoreCounter.SetText("Score: " + Mathf.RoundToInt(score).ToString("000000"));
-	}
+            scoreCounter.SetText("Score: " + Mathf.RoundToInt(score).ToString("000000"));
+        }
+    }
 }

@@ -26,7 +26,11 @@ public class BulletPatternList : MonoBehaviour {
 
 
     IEnumerator SpawnRoutine() {
+        yield return new WaitForSeconds(CountdownScript.timer);
+
         for (int i = 0; i < patternList.Length; i++) {
+            if (LivesScript.lives <= 0) { break; }
+
             Vector2 direction;
             if (patternList[i].aimAtPlayer) {
                 direction = Vector3.Normalize(-1 * transform.position + player.transform.position);

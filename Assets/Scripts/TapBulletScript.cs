@@ -30,35 +30,37 @@ public class TapBulletScript : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        if(LivesScript.lives > 0 && !(CountdownScript.timer > 0)) {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-        if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit)) {
-            if (hit.collider.tag != "Player") {
-                canFire = true;
-            }
-        } else if (Input.GetMouseButton(0) && canFire && Physics.Raycast(ray, out hit)) {
-            if(hit.collider.tag != "Player") {
-                touchPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                touchPoint.z = player.transform.position.z;
-
-                Vector3 direction = Vector3.Normalize(touchPoint - player.transform.position);
-
-                if (t == -1 && InkwellScript.inkLevel >= InkwellScript.bulletInk) {
-                    newBullet = Instantiate(bulletPrefab, player.transform.position, Quaternion.Euler(new Vector3(0, 270, 90)));
-                    newBullet.GetComponent<Rigidbody>().velocity = direction * bulletVelocity;
-
-                    InkwellScript.inkLevel -= InkwellScript.bulletInk;
-                    t = 0;
+            if (Input.GetMouseButtonDown(0) && Physics.Raycast(ray, out hit)) {
+                if (hit.collider.tag != "Player") {
+                    canFire = true;
                 }
+            } else if (Input.GetMouseButton(0) && canFire && Physics.Raycast(ray, out hit)) {
+                if (hit.collider.tag != "Player") {
+                    touchPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                    touchPoint.z = player.transform.position.z;
+
+                    Vector3 direction = Vector3.Normalize(touchPoint - player.transform.position);
+
+                    if (t == -1 && InkwellScript.inkLevel >= InkwellScript.bulletInk) {
+                        newBullet = Instantiate(bulletPrefab, player.transform.position, Quaternion.Euler(new Vector3(0, 270, 90)));
+                        newBullet.GetComponent<Rigidbody>().velocity = direction * bulletVelocity;
+
+                        InkwellScript.inkLevel -= InkwellScript.bulletInk;
+                        t = 0;
+                    }
+                }
+            } else if (Input.GetMouseButtonUp(0) && canFire) {
+                canFire = false;
             }
-        } else if (Input.GetMouseButtonUp(0) && canFire) {
-            canFire = false;
+
+            if (t >= 0) { t += Time.deltaTime; }
+
+            if (t > fireDelay) { t = -1; }
         }
-
-        if(t >= 0) { t += Time.deltaTime; }
-
-        if(t > fireDelay) { t = -1; }
     }
 
 }

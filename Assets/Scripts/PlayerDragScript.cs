@@ -29,38 +29,41 @@ public class PlayerDragScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
+        if (LivesScript.lives > 0 && !(CountdownScript.timer > 0)) { 
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-        if (Input.GetMouseButtonDown(0)) {
-            if (Physics.Raycast(ray, out hit)) {
+            if (Input.GetMouseButtonDown(0)) {
+                if (Physics.Raycast(ray, out hit)) {
 
-                if(hit.collider.tag == "Player") {
-                    player = hit.collider.gameObject;
+                    if(hit.collider.tag == "Player") {
+                        player = hit.collider.gameObject;
+                    }
                 }
+            } else if (Input.GetMouseButton(0) && player && canDrag) {
+                dragPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                dragPoint.z = player.transform.position.z;
+
+                dragLineObj.SetActive(true);
+                dragLine.SetPosition(0, player.transform.position);
+                dragLine.SetPosition(1, dragPoint);
+
+                Debug.DrawLine(player.transform.position, dragPoint, Color.green);
+                //Debug.Log(dragPoint);
+            } else if (Input.GetMouseButtonUp(0) && player && canDrag) {
+                dragPoint.x = Mathf.Clamp(dragPoint.x, xDimensions.x, xDimensions.y);
+                dragPoint.y = Mathf.Clamp(dragPoint.y, yDimensions.x, yDimensions.y);
+
+                if (InkwellScript.inkLevel >= InkwellScript.movementInk) {
+                    StartCoroutine(movePlayer(player, dragPoint, 0.125f));
+                    InkwellScript.inkLevel -= InkwellScript.movementInk;
+                }
+
+                player = null;
+                dragLineObj.SetActive(false);
             }
-        } else if (Input.GetMouseButton(0) && player && canDrag) {
-            dragPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            dragPoint.z = player.transform.position.z;
-
-            dragLineObj.SetActive(true);
-            dragLine.SetPosition(0, player.transform.position);
-            dragLine.SetPosition(1, dragPoint);
-
-            Debug.DrawLine(player.transform.position, dragPoint, Color.green);
-            //Debug.Log(dragPoint);
-        } else if (Input.GetMouseButtonUp(0) && player && canDrag) {
-            dragPoint.x = Mathf.Clamp(dragPoint.x, xDimensions.x, xDimensions.y);
-            dragPoint.y = Mathf.Clamp(dragPoint.y, yDimensions.x, yDimensions.y);
-
-            if (InkwellScript.inkLevel >= InkwellScript.movementInk) {
-                StartCoroutine(movePlayer(player, dragPoint, 0.125f));
-                InkwellScript.inkLevel -= InkwellScript.movementInk;
-            }
-
-            player = null;
+        } else {
             dragLineObj.SetActive(false);
-
         }
 	}
 

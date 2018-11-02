@@ -21,6 +21,7 @@ public class LivesScript : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        lives = Mathf.Clamp(lives, 0, setLives);
         livesCounter.SetText("Lives: " + lives);
 	}
 }
